@@ -5,16 +5,20 @@ using API.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace API.Controllers
 {
     public class BasketController : BaseApiController
     {
         private readonly StoreContext _context;
+
+        // Constructor to inject StoreContext
         public BasketController(StoreContext context)
         {
             _context = context;
         }
 
+        // Action to get the basket for the current user
         [HttpGet(Name = "GetBasket")]
         public async Task<ActionResult<BasketDto>> GetBasket()
         {
@@ -23,9 +27,9 @@ namespace API.Controllers
             return basket.MapBasketToDto();
         }
 
-
+        // Action to add an item to the basket
         [HttpPost]
-        public async Task<ActionResult> AddItemToBAsket(int productId, int quantity)
+        public async Task<ActionResult> AddItemToBasket(int productId, int quantity)
         {
             var basket = await RetrieveBasket(GetBuyerId());
 
@@ -44,7 +48,7 @@ namespace API.Controllers
             return BadRequest(new ProblemDetails { Title = "Problem saving item to basket" });
         }
 
-
+        // Action to remove an item from the basket
         [HttpDelete]
         public async Task<ActionResult> RemoveBasketItem(int productId, int quantity = 1)
         {
@@ -61,7 +65,7 @@ namespace API.Controllers
             return BadRequest(new ProblemDetails { Title = "Problem removing item from the basket" });
         }
 
-        // private method for retrieve specific basket 
+        // Private method to retrieve the basket for a specific buyer
         [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<Basket> RetrieveBasket(string buyerId)
         {
@@ -72,19 +76,19 @@ namespace API.Controllers
             }
 
             return await _context.Baskets
-            .Include(i => i.Items)
-            .ThenInclude(p => p.Product)
-            .FirstOrDefaultAsync(basket => basket.BuyerId == buyerId);
+                .Include(i => i.Items)
+                .ThenInclude(p => p.Product)
+                .FirstOrDefaultAsync(basket => basket.BuyerId == buyerId);
         }
 
-        // get buyer Id
+        // Private method to get the buyer Id
         [ApiExplorerSettings(IgnoreApi = true)]
         public string GetBuyerId()
         {
             return User.Identity?.Name ?? Request.Cookies["buyerId"];
         }
 
-        // Private method Create a new basket
+        // Private method to create a new basket
         [ApiExplorerSettings(IgnoreApi = true)]
         public Basket CreateBasket()
         {
