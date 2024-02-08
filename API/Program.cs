@@ -27,7 +27,7 @@ builder.Services.AddCors();
 
 // Configure Identity services.
 builder.Services.AddIdentityCore<User>(opt => opt.User.RequireUniqueEmail = true)
-    .AddRoles<IdentityRole>()
+    .AddRoles<Role>()
     .AddEntityFrameworkStores<StoreContext>();
 
 // Configure authentication and authorization services.
@@ -46,6 +46,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 
 builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<PaymentService>();
 
 // Build the application.
 var app = builder.Build();
